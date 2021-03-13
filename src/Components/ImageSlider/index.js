@@ -1,9 +1,10 @@
 import React from "react";
-import image1 from '../../images/600x200.png';
+import image1 from '../../images/200x200.png';
 import image2 from '../../images/300x400.png';
 import image3 from '../../images/200x600.png';
 import image4 from '../../images/400x300.png';
 import image5 from '../../images/600x200.png';
+import image6 from '../../images/600x200.png';
 
 class Canvas extends React.Component {
   state = {
@@ -35,8 +36,8 @@ class Canvas extends React.Component {
     console.log(this.pageX - (this.initialDragX - this.currentDragX));
     context.drawImage(
       this.imageObj1,
-      this.pageX - (this.initialDragX - this.currentDragX),
-      this.pageY - (this.initialDragY - this.currentDragY)
+      (this.pageX - (this.initialDragX - this.currentDragX)) + ((this.width - this.imageObj1.width) / 2),
+      ((this.height - this.imageObj1.height) / 2)
     );
   }
 
@@ -77,20 +78,20 @@ class Canvas extends React.Component {
     context.fillRect(0, 0, this.width, this.height);
   }
 
-  stopDrag = () => {
+  stopDragging = () => {
     this.pageX = this.pageX - (this.initialDragX - this.currentDragX);
-    this.pageY = this.pageY - (this.initialDragY - this.currentDragY);
+    this.pageY = 0;
     this.initialDragX = this.currentDragX;
     this.initialDragY = this.currentDragY;
   }
 
   handleMouseOut = e => {
-    this.stopDrag();
+    this.stopDragging();
     this.setState({ isDragging: false });
   };
 
   handleMouseUp = e => {
-    this.stopDrag();
+    this.stopDragging();
     this.setState({ isDragging: false });
   };
 
