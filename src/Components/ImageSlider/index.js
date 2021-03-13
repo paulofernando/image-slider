@@ -6,6 +6,8 @@ import image4 from '../../images/400x300.png';
 import image5 from '../../images/600x200.png';
 import image6 from '../../images/600x200.png';
 
+const images = [image1, image2, image3];
+
 class ImageSlider extends React.Component {
   state = {
     isDragging: false,
@@ -19,8 +21,6 @@ class ImageSlider extends React.Component {
     this.height = 300;
     this.initialDragX = 0;
     this.currentDragX = 0;
-    this.pageX = 0;
-    this.pageY = 0;
   }
 
   go() {
@@ -31,23 +31,30 @@ class ImageSlider extends React.Component {
 
   drawImage() {
     const { context } = this.state;
-    context.drawImage(
-      this.imageObj1,
-      (this.pageX - (this.initialDragX - this.currentDragX)) + ((this.width - this.imageObj1.width) / 2),
-      ((this.height - this.imageObj1.height) / 2)
-    );
+    this.pages.forEach(({ image, x }, index) => {
+      context.drawImage(
+        image,
+        (x - (this.initialDragX - this.currentDragX)) + ((this.width - image.width) / 2) + (index * this.width),
+        ((this.height - image.height) / 2)
+      );
+    })
   }
 
   componentDidMount() {
     this.setState({ context: this.canvasRef.current.getContext("2d") });
     let that = this;
 
-    const imageObj1 = new Image()
-    imageObj1.src = image1
-    imageObj1.onload = function() {
-      that.go();
-    }
-    this.imageObj1 = imageObj1
+    this.pages = images.map((img) => {
+      const image = new Image();
+      image.src = img;
+      image.onload = function() {
+        that.go();
+      }
+      return ({
+        x: 0,
+        image,
+      })
+    })
   }
 
   handleMouseDown = e => {
@@ -73,19 +80,19 @@ class ImageSlider extends React.Component {
   }
 
   stopDragging = () => {
-    this.pageX = this.pageX - (this.initialDragX - this.currentDragX);
-    this.pageY = 0;
+    for (let i = 0; i < this.pages.length; i++) {
+      this.pages[i].x -= (this.initialDragX - this.currentDragX);
+    }
     this.initialDragX = this.currentDragX;
+    this.setState({ isDragging: false });
   }
 
   handleMouseOut = e => {
     this.stopDragging();
-    this.setState({ isDragging: false });
   };
 
   handleMouseUp = e => {
     this.stopDragging();
-    this.setState({ isDragging: false });
   };
 
 
