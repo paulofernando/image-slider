@@ -6,7 +6,7 @@ import image4 from '../../images/400x300.png';
 import image5 from '../../images/600x200.png';
 import image6 from '../../images/600x200.png';
 
-class Canvas extends React.Component {
+class ImageSlider extends React.Component {
   state = {
     isDragging: false,
     context: null
@@ -18,9 +18,7 @@ class Canvas extends React.Component {
     this.width = 300;
     this.height = 300;
     this.initialDragX = 0;
-    this.initialDragY = 0;
     this.currentDragX = 0;
-    this.currentDragY = 0;
     this.pageX = 0;
     this.pageY = 0;
   }
@@ -33,7 +31,6 @@ class Canvas extends React.Component {
 
   drawImage() {
     const { context } = this.state;
-    console.log(this.pageX - (this.initialDragX - this.currentDragX));
     context.drawImage(
       this.imageObj1,
       (this.pageX - (this.initialDragX - this.currentDragX)) + ((this.width - this.imageObj1.width) / 2),
@@ -55,9 +52,7 @@ class Canvas extends React.Component {
 
   handleMouseDown = e => {
     this.initialDragX = e.pageX;
-    this.initialDragY = e.pageY;
     this.currentDragX = e.pageX;
-    this.currentDragY = e.pageY;
     this.setState({
       isDragging: true
     });
@@ -67,7 +62,6 @@ class Canvas extends React.Component {
     const { isDragging } = this.state;
     if (isDragging) {
       this.currentDragX = e.pageX;
-      this.currentDragY = e.pageY;
       this.currentX = this.currentX - (this.initialDragX - e.pageX);
     }
   };
@@ -82,7 +76,6 @@ class Canvas extends React.Component {
     this.pageX = this.pageX - (this.initialDragX - this.currentDragX);
     this.pageY = 0;
     this.initialDragX = this.currentDragX;
-    this.initialDragY = this.currentDragY;
   }
 
   handleMouseOut = e => {
@@ -114,4 +107,4 @@ class Canvas extends React.Component {
   }
 }
 
-export default Canvas;
+export default ImageSlider;
