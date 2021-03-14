@@ -50,12 +50,11 @@ class ImageSlider extends React.Component {
       image.onload = function() {
         that.go();
       }
-      return ({
-        x: 0,
-        image,
-      })
+      return ({ x: 0, image });
     })
   }
+
+  insideBoundaries = () => (this.pages[0].x - (this.initialDragX - this.currentDragX) <= 0)
 
   handleMouseDown = e => {
     this.initialDragX = e.pageX;
@@ -67,24 +66,25 @@ class ImageSlider extends React.Component {
 
   handleMouseMove = e => {
     const { isDragging } = this.state;
-    if (isDragging) {
+    if (isDragging && (this.insideBoundaries())) {
       this.currentDragX = e.pageX;
-      this.currentX = this.currentX - (this.initialDragX - e.pageX);
     }
   };
+
+  stopDragging = () => {
+    if (this.insideBoundaries()) {
+      for (let i = 0; i < this.pages.length; i++) {
+        this.pages[i].x -= (this.initialDragX - this.currentDragX);
+      }
+      this.initialDragX = this.currentDragX;
+    }
+    this.setState({ isDragging: false });
+  }
 
   resetCanvas() {
     const { context } = this.state;
     context.fillStyle = "#fff";
     context.fillRect(0, 0, this.width, this.height);
-  }
-
-  stopDragging = () => {
-    for (let i = 0; i < this.pages.length; i++) {
-      this.pages[i].x -= (this.initialDragX - this.currentDragX);
-    }
-    this.initialDragX = this.currentDragX;
-    this.setState({ isDragging: false });
   }
 
   handleMouseOut = e => {
