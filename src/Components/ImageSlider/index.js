@@ -65,8 +65,8 @@ class ImageSlider extends React.Component {
       if ((this.isLeftBoundaryValid() && this.isMovingToTheLeft(e.pageX))
           || (this.isRightBoundaryValid() && this.isMovingToTheRight(e.pageX))) {
         this.currentDragX = e.pageX;
-        requestAnimationFrame(this.go.bind(this));
       }
+      requestAnimationFrame(this.go.bind(this));
     }
     this.oldX = e.pageX;
   };
