@@ -1,0 +1,107 @@
+module.exports = {
+  extends: 'airbnb',
+  parser: 'babel-eslint',
+  parserOptions: {
+    ecmaVersion: 11,
+    sourceType: 'module',
+    jsx: true,
+  },
+  plugins: [
+    'react',
+  ],
+  overrides: [
+    {
+      files: [
+        '**/*.test.js',
+        '**/*.test.jsx'
+      ],
+      env: {
+        jest: true
+      }
+    }
+  ],
+  rules: {
+    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
+    'react/prop-types': 'off',
+    'operator-linebreak': 'off',
+    'react/state-in-constructor': 'off',
+    'react/static-property-placement': 'warn',
+    'react/jsx-closing-bracket-location': 'warn',
+    'react/jsx-closing-tag-location': 'warn',
+    'react/jsx-tag-spacing': 'warn',
+    'jsx-a11y/img-redundant-alt': 'warn',
+    'jsx-a11y/anchor-is-valid': 'warn',
+    'jsx-a11y/aria-props': 'warn',
+    'jsx-a11y/aria-proptypes': 'warn',
+    'jsx-a11y/aria-unsupported-elements': 'warn',
+    'jsx-a11y/autocomplete-valid': 'warn',
+    'jsx-a11y/heading-has-content': 'warn',
+    'jsx-a11y/alt-text': 'error',
+    'jsx-a11y/aria-role': 'warn',
+    'jsx-a11y/no-access-key': 'warn',
+    'jsx-a11y/lang': 'warn',
+    'jsx-a11y/no-noninteractive-element-to-interactive-role': [
+      'error',
+      {
+        ul: [
+          'listbox',
+          'menu',
+          'menubar',
+          'radiogroup',
+          'tablist',
+          'tree',
+          'treegrid',
+        ],
+        ol: [
+          'listbox',
+          'menu',
+          'menubar',
+          'radiogroup',
+          'tablist',
+          'tree',
+          'treegrid',
+        ],
+        li: ['menuitem', 'option', 'row', 'tab', 'treeitem'],
+        table: ['grid'],
+        td: ['gridcell'],
+      },
+    ],
+    'jsx-a11y/no-noninteractive-element-interactions': [
+      'error',
+      {
+        handlers: [
+          'onClick',
+          'onMouseDown',
+          'onMouseUp',
+          'onKeyPress',
+          'onKeyDown',
+          'onKeyUp',
+        ],
+      },
+    ],
+    'jsx-a11y/no-noninteractive-tabindex': 'warn',
+    'jsx-a11y/no-onchange': 'warn',
+    'jsx-a11y/no-redundant-roles': 'warn',
+    'jsx-a11y/no-static-element-interactions': 'warn',
+    'jsx-a11y/role-has-required-aria-props': 'warn',
+    'jsx-a11y/role-supports-aria-props': 'warn',
+    'jsx-a11y/scope': 'warn',
+    'jsx-a11y/tabindex-no-positive': 'warn',
+    'no-multi-spaces': 'warn',
+    'react/jsx-wrap-multilines': 'warn',
+    'react/self-closing-comp': 'warn',
+    'jsx-quotes': 'warn',
+    'react/jsx-curly-spacing': 'warn',
+    'react/jsx-boolean-value': 'warn',
+    'react/no-string-refs': 'error',
+    'react/no-array-index-key': 'error',
+    'react/jsx-no-bind': 'error',
+    'react/require-render-return': 'error',
+    'react/no-is-mounted': 'error',
+    'react/no-multi-comp': 'error',
+    'react/prefer-es6-class': 'error',
+    'react/prefer-stateless-function': 'error',
+    'react/jsx-pascal-case': 'error',
+    'semi': 'error',
+  },
+};
