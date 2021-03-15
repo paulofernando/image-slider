@@ -20,7 +20,7 @@ class ImageSlider extends React.Component {
     this.currentDragX = 0;
     this.firstPageX = 0;
     this.offset = 0;
-    this.oldX = 0;
+    this.oldX = 0; // used to control movement direction
   }
 
   go() {
@@ -64,7 +64,7 @@ class ImageSlider extends React.Component {
   }
 
   isRightBoundaryValid = () => {
-    const lastPageX = this.firstPageX + (this.pages.length * this.width);
+    const lastPageX = this.firstPageX + ((this.pages.length - 1) * this.width);
     return lastPageX + this.width - (this.offset) >= this.width;
   }
 
@@ -92,7 +92,7 @@ class ImageSlider extends React.Component {
     const { isDragging } = this.state;
     if (isDragging) {
       if (this.insideBoundaries() || (this.isLeftBoundaryValid() && this.isMovingToTheLeft(e.pageX))
-          || (this.isRightBoundaryValid() && this.isMovingToTheRight(e.pageX))){
+          || (this.isRightBoundaryValid() && this.isMovingToTheRight(e.pageX))) {
         this.currentDragX = e.pageX;
         requestAnimationFrame(this.go.bind(this));
       }
