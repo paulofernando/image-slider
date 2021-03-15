@@ -27,18 +27,17 @@ class ImageSlider extends React.Component {
     this.setState({ context: this.canvasRef.current.getContext('2d') }, () => {
       this.go();
     });
+    this.pages = images.map((img) => (this.createPage(img)));
+  }
 
-    const that = this;
-
-    this.pages = images.map((img) => {
-      const image = new Image();
-      image.src = img;
-      image.onload = () => that.go();
-      return {
-        image,
-        scale: Math.min(this.width / image.width, this.height / image.height),
-      };
-    });
+  createPage = (img) => {
+    const image = new Image();
+    image.src = img;
+    image.onload = () => this.go();
+    return {
+      image,
+      scale: Math.min(this.width / image.width, this.height / image.height),
+    };
   }
 
   isLeftBoundaryValid = () => this.firstPageX - (this.offset) <= 0;
@@ -47,8 +46,6 @@ class ImageSlider extends React.Component {
     const lastPageX = this.firstPageX + ((this.pages.length - 1) * this.width);
     return lastPageX + this.width - (this.offset) >= this.width;
   }
-
-  insideBoundaries = () => (this.isLeftBoundaryValid() && this.isRightBoundaryValid());
 
   handleMouseDown = (e) => {
     this.initialDragX = e.pageX;
