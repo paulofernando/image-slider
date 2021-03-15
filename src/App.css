@@ -3,6 +3,17 @@
   background-color: antiquewhite;
 }
 
-.slider {
-  border: medium red;
+.image-slider {
+  border: 1px solid black;
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
 }
+
+.image-slider:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+

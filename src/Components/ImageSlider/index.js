@@ -24,16 +24,16 @@ class ImageSlider extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({ context: this.canvasRef.current.getContext('2d') });
+    this.setState({ context: this.canvasRef.current.getContext('2d') }, () => {
+      this.go();
+    });
+
     const that = this;
 
     this.pages = images.map((img) => {
       const image = new Image();
       image.src = img;
-      image.onload = function () {
-        that.go();
-      };
-
+      image.onload = () => that.go();
       return {
         image,
         scale: Math.min(this.width / image.width, this.height / image.height),
@@ -41,14 +41,14 @@ class ImageSlider extends React.Component {
     });
   }
 
-  isLeftBoundaryValid = () => this.firstPageX - (this.offset) <= 0
+  isLeftBoundaryValid = () => this.firstPageX - (this.offset) <= 0;
 
   isRightBoundaryValid = () => {
     const lastPageX = this.firstPageX + ((this.pages.length - 1) * this.width);
     return lastPageX + this.width - (this.offset) >= this.width;
   }
 
-  insideBoundaries = () => (this.isLeftBoundaryValid() && this.isRightBoundaryValid())
+  insideBoundaries = () => (this.isLeftBoundaryValid() && this.isRightBoundaryValid());
 
   handleMouseDown = (e) => {
     this.initialDragX = e.pageX;
@@ -56,7 +56,7 @@ class ImageSlider extends React.Component {
     this.setState({
       isDragging: true,
     });
-  };
+  }
 
   isMovingToTheLeft = (currentX) => currentX - this.oldX > 0
 
@@ -65,7 +65,8 @@ class ImageSlider extends React.Component {
   handleMouseMove = (e) => {
     const { isDragging } = this.state;
     if (isDragging) {
-      if (this.insideBoundaries() || (this.isLeftBoundaryValid() && this.isMovingToTheLeft(e.pageX))
+      if (this.insideBoundaries()
+          || (this.isLeftBoundaryValid() && this.isMovingToTheLeft(e.pageX))
           || (this.isRightBoundaryValid() && this.isMovingToTheRight(e.pageX))) {
         this.currentDragX = e.pageX;
         requestAnimationFrame(this.go.bind(this));
@@ -75,10 +76,8 @@ class ImageSlider extends React.Component {
   };
 
   stopDragging = () => {
-    if (this.insideBoundaries()) {
-      this.firstPageX -= this.offset;
-      this.initialDragX = this.currentDragX;
-    }
+    this.firstPageX = this.calculateXWithOffset(this.offset);
+    this.initialDragX = this.currentDragX;
     this.setState({ isDragging: false });
   }
 
@@ -90,13 +89,26 @@ class ImageSlider extends React.Component {
     this.stopDragging();
   };
 
+  calculateXWithOffset = () => {
+    if (this.firstPageX - this.offset > 0) {
+      return 0; // return max value for first page left
+    }
+
+    if (this.firstPageX - this.offset < (this.width * (this.pages.length - 1) * -1)) {
+      return (this.width * (this.pages.length - 1) * -1); // return min value for last page right
+    }
+
+    return this.firstPageX - this.offset;
+  }
+
   scaleToFitAndDrawImage() {
     const { context } = this.state;
     this.offset = this.initialDragX - this.currentDragX;
+    const x = this.calculateXWithOffset(this.offset);
     this.pages.forEach(({ image, scale }, index) => {
       context.drawImage(
         image,
-        (this.firstPageX + (this.width * index) - (this.offset)) + ((this.width / 2) - (image.width / 2) * scale),
+        (x + (this.width * index)) + ((this.width / 2) - (image.width / 2) * scale),
         ((this.height - (image.height * scale)) / 2),
         image.width * scale, image.height * scale,
       );
@@ -120,9 +132,7 @@ class ImageSlider extends React.Component {
         ref={this.canvasRef}
         width={this.width}
         height={this.height}
-        style={{
-          border: '1px solid black',
-        }}
+        className="image-slider"
         onMouseDown={this.handleMouseDown}
         onMouseUp={this.handleMouseUp}
         onMouseMove={this.handleMouseMove}
