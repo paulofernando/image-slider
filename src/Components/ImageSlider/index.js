@@ -5,6 +5,7 @@ class ImageSlider extends React.Component {
   state = {
     isDragging: false,
     context: null,
+    currentPage: 0,
   };
 
   constructor(props) {
@@ -70,9 +71,13 @@ class ImageSlider extends React.Component {
   };
 
   stopDragging = () => {
+    const { width } = this.props;
     this.firstPageX = this.calculateXWithOffset(this.offset);
     this.initialDragX = this.currentDragX;
-    this.setState({ isDragging: false });
+    this.setState({
+      isDragging: false,
+      currentPage: (this.currentDragX === 0 ? 0 : Math.round(Math.abs(this.firstPageX) / width)),
+    });
   }
 
   handleMouseOut = () => {
@@ -97,17 +102,20 @@ class ImageSlider extends React.Component {
   }
 
   scaleToFitAndDrawImage() {
-    const { context } = this.state;
+    const { context, currentPage } = this.state;
     const { width, height } = this.props;
     this.offset = this.initialDragX - this.currentDragX;
     const x = this.calculateXWithOffset(this.offset);
     this.pages.forEach(({ image, scale }, index) => {
-      context.drawImage(
-        image,
-        (x + (width * index)) + ((width / 2) - (image.width / 2) * scale),
-        ((height - (image.height * scale)) / 2),
-        image.width * scale, image.height * scale,
-      );
+      // just paint current page and the adjacent
+      if (currentPage - index >= -1 && currentPage - index <= 1) {
+        context.drawImage(
+          image,
+          (x + (width * index)) + ((width / 2) - (image.width / 2) * scale),
+          ((height - (image.height * scale)) / 2),
+          image.width * scale, image.height * scale,
+        );
+      }
     });
   }
 
