@@ -16,6 +16,7 @@ function App() {
         width={400}
         height={300}
         images={[image1, image2, image3, image4, image5, image6]}
+        showPageBorders
       />
     </div>
   );

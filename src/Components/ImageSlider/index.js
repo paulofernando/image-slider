@@ -103,7 +103,7 @@ class ImageSlider extends React.Component {
 
   scaleToFitAndDrawImage() {
     const { context, currentPage } = this.state;
-    const { width, height } = this.props;
+    const { width, height, showPageBorders } = this.props;
     this.offset = this.initialDragX - this.currentDragX;
     const x = this.calculateXWithOffset(this.offset);
     this.pages.forEach(({ image, scale }, index) => {
@@ -115,10 +115,12 @@ class ImageSlider extends React.Component {
           ((height - (image.height * scale)) / 2),
           image.width * scale, image.height * scale,
         );
-        context.beginPath();
-        context.strokeStyle = '#ccc';
-        context.lineWidth = 1;
-        context.strokeRect(x + (width * index), 0, width, height);
+        if (showPageBorders) {
+          context.beginPath();
+          context.strokeStyle = '#ccc';
+          context.lineWidth = 1;
+          context.strokeRect(x + (width * index), 0, width, height);
+        }
       }
     });
   }
@@ -131,7 +133,7 @@ class ImageSlider extends React.Component {
   resetCanvas() {
     const { context } = this.state;
     const { width, height } = this.props;
-    context.fillStyle = '#fff';
+    context.fillStyle = '#eee';
     context.fillRect(0, 0, width, height);
   }
 
@@ -157,11 +159,13 @@ ImageSlider.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  showPageBorders: PropTypes.bool,
 };
 
 ImageSlider.defaultProps = {
   width: 300,
   height: 300,
+  showPageBorders: false,
 };
 
 export default ImageSlider;
