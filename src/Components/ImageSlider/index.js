@@ -65,8 +65,7 @@ class ImageSlider extends React.Component {
   handleMouseMove = (e) => {
     const { isDragging } = this.state;
     if (isDragging) {
-      if (this.insideBoundaries()
-          || (this.isLeftBoundaryValid() && this.isMovingToTheLeft(e.pageX))
+      if ((this.isLeftBoundaryValid() && this.isMovingToTheLeft(e.pageX))
           || (this.isRightBoundaryValid() && this.isMovingToTheRight(e.pageX))) {
         this.currentDragX = e.pageX;
         requestAnimationFrame(this.go.bind(this));
