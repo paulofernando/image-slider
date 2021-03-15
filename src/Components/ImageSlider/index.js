@@ -1,10 +1,7 @@
-import React from "react";
+import React from 'react';
 import image1 from '../../images/200x200.png';
 import image2 from '../../images/300x400.png';
-import image3 from '../../images/200x600.png';
-import image4 from '../../images/400x300.png';
 import image5 from '../../images/600x200.png';
-import image6 from '../../images/300x300.png';
 
 const images = [image1, image2, image5];
 
@@ -21,6 +18,9 @@ class ImageSlider extends React.Component {
     this.height = 300;
     this.initialDragX = 0;
     this.currentDragX = 0;
+    this.firstPageX = 0;
+    this.offset = 0;
+    this.oldX = 0;
   }
 
   go() {
@@ -30,10 +30,11 @@ class ImageSlider extends React.Component {
 
   scaleToFitAndDrawImage() {
     const { context } = this.state;
-    this.pages.forEach(({ image, x, scale }, index) => {
+    this.offset = this.initialDragX - this.currentDragX;
+    this.pages.forEach(({ image, scale }, index) => {
       context.drawImage(
         image,
-        (x - (this.initialDragX - this.currentDragX)) + ((this.width / 2) - (image.width / 2) * scale),
+        (this.firstPageX + (this.width * index) - (this.offset)) + ((this.width / 2) - (image.width / 2) * scale),
         ((this.height - (image.height * scale)) / 2),
         image.width * scale, image.height * scale
       );
@@ -44,7 +45,6 @@ class ImageSlider extends React.Component {
     this.setState({ context: this.canvasRef.current.getContext("2d") });
     let that = this;
 
-    let currentPageX = 0;
     this.pages = images.map((img) => {
       const image = new Image();
       image.src = img;
@@ -52,24 +52,24 @@ class ImageSlider extends React.Component {
         that.go();
       }
 
-      const page = {
-        x: currentPageX,
+      return {
         image,
         scale: Math.min(this.width / image.width, this.height / image.height),
-      }
-
-      currentPageX += this.width;
-      return page;
+      };
     })
   }
 
-  insideBoundaries = () => {
-    const firstPage = this.pages[0];
-    const lastPage = this.pages[this.pages.length - 1];
-    const isLeftBoundaryValid = firstPage.x - (this.initialDragX - this.currentDragX) <= 0;
-    const isRightBoundaryValid = lastPage.x + this.width - (this.initialDragX - this.currentDragX) >= this.width;
+  isLeftBoundaryValid = () => {
+    return this.firstPageX - (this.offset) <= 0;
+  }
 
-    return (isLeftBoundaryValid && isRightBoundaryValid)
+  isRightBoundaryValid = () => {
+    const lastPageX = this.firstPageX + (this.pages.length * this.width);
+    return lastPageX + this.width - (this.offset) >= this.width;
+  }
+
+  insideBoundaries = () => {
+    return (this.isLeftBoundaryValid() && this.isRightBoundaryValid())
   }
 
   handleMouseDown = e => {
@@ -80,28 +80,33 @@ class ImageSlider extends React.Component {
     });
   };
 
+  isMovingToTheLeft = (currentX) => {
+    return currentX - this.oldX > 0;
+  }
+
+  isMovingToTheRight = (currentX) => {
+    return currentX - this.oldX < 0;
+  }
+
   handleMouseMove = e => {
     const { isDragging } = this.state;
-    if (isDragging && (this.insideBoundaries())) {
-      this.currentDragX = e.pageX;
+    if (isDragging) {
+      if (this.insideBoundaries() || (this.isLeftBoundaryValid() && this.isMovingToTheLeft(e.pageX))
+          || (this.isRightBoundaryValid() && this.isMovingToTheRight(e.pageX))){
+        this.currentDragX = e.pageX;
+        requestAnimationFrame(this.go.bind(this));
+      }
     }
-    requestAnimationFrame(this.go.bind(this));
+    this.oldX = e.pageX;
   };
+
 
   stopDragging = () => {
     if (this.insideBoundaries()) {
-      for (let i = 0; i < this.pages.length; i++) {
-        this.pages[i].x -= (this.initialDragX - this.currentDragX);
-      }
+      this.firstPageX -= this.offset;
       this.initialDragX = this.currentDragX;
     }
     this.setState({ isDragging: false });
-  }
-
-  resetCanvas() {
-    const { context } = this.state;
-    context.fillStyle = "#fff";
-    context.fillRect(0, 0, this.width, this.height);
   }
 
   handleMouseOut = e => {
@@ -112,6 +117,11 @@ class ImageSlider extends React.Component {
     this.stopDragging();
   };
 
+  resetCanvas() {
+    const { context } = this.state;
+    context.fillStyle = "#fff";
+    context.fillRect(0, 0, this.width, this.height);
+  }
 
   render() {
     return (
