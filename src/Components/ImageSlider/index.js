@@ -20,20 +20,18 @@ class ImageSlider extends React.Component {
 
   componentDidMount() {
     const { images } = this.props;
-    this.setState({ context: this.canvasRef.current.getContext('2d') }, () => {
-      this.go();
-    });
+    this.setState({ context: this.canvasRef.current.getContext('2d') });
     this.pages = images.map((img) => (this.createPage(img)));
   }
 
   createPage = (img) => {
     const { width, height } = this.props;
     const image = new Image();
-    image.src = img;
     const that = this;
     image.onload = function () {
       that.go();
     };
+    image.src = img;
     return {
       image,
       scale: Math.min(width / image.width, height / image.height),
