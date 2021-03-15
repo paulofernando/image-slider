@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import image1 from '../../images/200x200.png';
 import image2 from '../../images/300x400.png';
 import image5 from '../../images/600x200.png';
@@ -14,8 +16,6 @@ class ImageSlider extends React.Component {
   constructor() {
     super();
     this.canvasRef = React.createRef();
-    this.width = 300;
-    this.height = 300;
     this.initialDragX = 0;
     this.currentDragX = 0;
     this.firstPageX = 0;
@@ -31,28 +31,28 @@ class ImageSlider extends React.Component {
   }
 
   createPage = (img) => {
+    const { width, height } = this.props;
     const image = new Image();
     image.src = img;
     image.onload = () => this.go();
     return {
       image,
-      scale: Math.min(this.width / image.width, this.height / image.height),
+      scale: Math.min(width / image.width, height / image.height),
     };
   }
 
   isLeftBoundaryValid = () => this.firstPageX - (this.offset) <= 0;
 
   isRightBoundaryValid = () => {
-    const lastPageX = this.firstPageX + ((this.pages.length - 1) * this.width);
-    return lastPageX + this.width - (this.offset) >= this.width;
+    const { width } = this.props;
+    const lastPageX = this.firstPageX + ((this.pages.length - 1) * width);
+    return lastPageX + width - (this.offset) >= width;
   }
 
   handleMouseDown = (e) => {
     this.initialDragX = e.pageX;
     this.currentDragX = e.pageX;
-    this.setState({
-      isDragging: true,
-    });
+    this.setState({ isDragging: true });
   }
 
   isMovingToTheLeft = (currentX) => currentX - this.oldX > 0
@@ -77,21 +77,22 @@ class ImageSlider extends React.Component {
     this.setState({ isDragging: false });
   }
 
-  handleMouseOut = (e) => {
+  handleMouseOut = () => {
     this.stopDragging();
   };
 
-  handleMouseUp = (e) => {
+  handleMouseUp = () => {
     this.stopDragging();
   };
 
-  calculateXWithOffset = () => {
+  calculateXWithOffset = () => { // control boundaries
+    const { width } = this.props;
     if (this.firstPageX - this.offset > 0) {
       return 0; // return max value for first page left
     }
 
-    if (this.firstPageX - this.offset < (this.width * (this.pages.length - 1) * -1)) {
-      return (this.width * (this.pages.length - 1) * -1); // return min value for last page right
+    if (this.firstPageX - this.offset < (width * (this.pages.length - 1) * -1)) {
+      return (width * (this.pages.length - 1) * -1); // return min value for last page right
     }
 
     return this.firstPageX - this.offset;
@@ -99,13 +100,14 @@ class ImageSlider extends React.Component {
 
   scaleToFitAndDrawImage() {
     const { context } = this.state;
+    const { width, height } = this.props;
     this.offset = this.initialDragX - this.currentDragX;
     const x = this.calculateXWithOffset(this.offset);
     this.pages.forEach(({ image, scale }, index) => {
       context.drawImage(
         image,
-        (x + (this.width * index)) + ((this.width / 2) - (image.width / 2) * scale),
-        ((this.height - (image.height * scale)) / 2),
+        (x + (width * index)) + ((width / 2) - (image.width / 2) * scale),
+        ((height - (image.height * scale)) / 2),
         image.width * scale, image.height * scale,
       );
     });
@@ -118,16 +120,18 @@ class ImageSlider extends React.Component {
 
   resetCanvas() {
     const { context } = this.state;
+    const { width, height } = this.props;
     context.fillStyle = '#fff';
-    context.fillRect(0, 0, this.width, this.height);
+    context.fillRect(0, 0, width, height);
   }
 
   render() {
+    const { width, height } = this.props;
     return (
       <canvas
         ref={this.canvasRef}
-        width={this.width}
-        height={this.height}
+        width={width}
+        height={height}
         className="image-slider"
         onMouseDown={this.handleMouseDown}
         onMouseUp={this.handleMouseUp}
@@ -138,5 +142,15 @@ class ImageSlider extends React.Component {
     );
   }
 }
+
+ImageSlider.propTypes = {
+  width: PropTypes.number,
+  height: PropTypes.number,
+};
+
+ImageSlider.defaultProps = {
+  width: 300,
+  height: 300,
+};
 
 export default ImageSlider;
