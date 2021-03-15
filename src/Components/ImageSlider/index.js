@@ -4,9 +4,9 @@ import image2 from '../../images/300x400.png';
 import image3 from '../../images/200x600.png';
 import image4 from '../../images/400x300.png';
 import image5 from '../../images/600x200.png';
-import image6 from '../../images/600x200.png';
+import image6 from '../../images/300x300.png';
 
-const images = [image1, image2, image3];
+const images = [image1, image2, image5];
 
 class ImageSlider extends React.Component {
   state = {
@@ -25,17 +25,17 @@ class ImageSlider extends React.Component {
 
   go() {
     this.resetCanvas();
-    this.drawImage();
-    requestAnimationFrame(this.go.bind(this));
+    this.scaleToFitAndDrawImage();
   }
 
-  drawImage() {
+  scaleToFitAndDrawImage() {
     const { context } = this.state;
-    this.pages.forEach(({ image, x }, index) => {
+    this.pages.forEach(({ image, x, scale }, index) => {
       context.drawImage(
         image,
-        (x - (this.initialDragX - this.currentDragX)) + ((this.width - image.width) / 2) + (index * this.width),
-        ((this.height - image.height) / 2)
+        (x - (this.initialDragX - this.currentDragX)) + ((this.width / 2) - (image.width / 2) * scale),
+        ((this.height - (image.height * scale)) / 2),
+        image.width * scale, image.height * scale
       );
     })
   }
@@ -44,17 +44,33 @@ class ImageSlider extends React.Component {
     this.setState({ context: this.canvasRef.current.getContext("2d") });
     let that = this;
 
+    let currentPageX = 0;
     this.pages = images.map((img) => {
       const image = new Image();
       image.src = img;
       image.onload = function() {
         that.go();
       }
-      return ({ x: 0, image });
+
+      const page = {
+        x: currentPageX,
+        image,
+        scale: Math.min(this.width / image.width, this.height / image.height),
+      }
+
+      currentPageX += this.width;
+      return page;
     })
   }
 
-  insideBoundaries = () => (this.pages[0].x - (this.initialDragX - this.currentDragX) <= 0)
+  insideBoundaries = () => {
+    const firstPage = this.pages[0];
+    const lastPage = this.pages[this.pages.length - 1];
+    const isLeftBoundaryValid = firstPage.x - (this.initialDragX - this.currentDragX) <= 0;
+    const isRightBoundaryValid = lastPage.x + this.width - (this.initialDragX - this.currentDragX) >= this.width;
+
+    return (isLeftBoundaryValid && isRightBoundaryValid)
+  }
 
   handleMouseDown = e => {
     this.initialDragX = e.pageX;
@@ -69,6 +85,7 @@ class ImageSlider extends React.Component {
     if (isDragging && (this.insideBoundaries())) {
       this.currentDragX = e.pageX;
     }
+    requestAnimationFrame(this.go.bind(this));
   };
 
   stopDragging = () => {
