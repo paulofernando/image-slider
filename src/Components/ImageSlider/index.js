@@ -115,6 +115,10 @@ class ImageSlider extends React.Component {
           ((height - (image.height * scale)) / 2),
           image.width * scale, image.height * scale,
         );
+        context.beginPath();
+        context.strokeStyle = '#ccc';
+        context.lineWidth = 1;
+        context.strokeRect(x + (width * index), 0, width, height);
       }
     });
   }
