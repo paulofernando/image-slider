@@ -1,20 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import image1 from '../../images/200x200.png';
-import image2 from '../../images/300x400.png';
-import image5 from '../../images/600x200.png';
-
-const images = [image1, image2, image5];
-
 class ImageSlider extends React.Component {
   state = {
     isDragging: false,
     context: null,
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.canvasRef = React.createRef();
     this.initialDragX = 0;
     this.currentDragX = 0;
@@ -24,6 +18,7 @@ class ImageSlider extends React.Component {
   }
 
   componentDidMount() {
+    const { images } = this.props;
     this.setState({ context: this.canvasRef.current.getContext('2d') }, () => {
       this.go();
     });
@@ -34,7 +29,10 @@ class ImageSlider extends React.Component {
     const { width, height } = this.props;
     const image = new Image();
     image.src = img;
-    image.onload = () => this.go();
+    const that = this;
+    image.onload = function () {
+      that.go();
+    };
     return {
       image,
       scale: Math.min(width / image.width, height / image.height),
@@ -146,6 +144,7 @@ class ImageSlider extends React.Component {
 ImageSlider.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
+  images: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 ImageSlider.defaultProps = {

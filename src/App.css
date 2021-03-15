@@ -5,7 +5,6 @@
 
 .image-slider {
   border: 1px solid black;
-  cursor: move; /* fallback if grab cursor is unsupported */
   cursor: grab;
   cursor: -moz-grab;
   cursor: -webkit-grab;
