@@ -18,10 +18,10 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start:dev": "react-scripts start",
-    "start": "REACT_APP_ENV=production yarn run start",
-    "build:dev": "react-scripts build",
-    "build": "REACT_APP_ENV=production yarn run build",
+    "start": "react-scripts start",
+    "start:production": "REACT_APP_ENV=production yarn run start",
+    "build": "react-scripts build",
+    "build:production": "REACT_APP_ENV=production yarn run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
