@@ -36,3 +36,14 @@ After build the packages, you can serve the files using Express
 
 Runs the app in the production mode.\
 The server will be running on port 8080
+
+# Static files
+
+You can find the static files ready to be served, on the build folder.
+
+Run `npm i nws` to install the static file server.
+
+Then go to the build folder and run `nws`
+
+This will launch a server on port 3030 for you to visit in your web browser at [http://localhost:3030](http://localhost:3030).
+
