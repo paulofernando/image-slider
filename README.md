@@ -1,3 +1,8 @@
+# How to check it out
+
+The app is running on an Amazon EC2 server, and the link is down below:
+http://ec2-3-83-153-43.compute-1.amazonaws.com/
+
 # How to build
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
