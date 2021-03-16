@@ -21,7 +21,7 @@ class ImageSlider extends React.Component {
   componentDidMount() {
     const { images } = this.props;
     this.setState({ context: this.canvasRef.current.getContext('2d') });
-    this.pages = images.map((img) => (this.createPage(img)));
+    this.pages = images.map((img) => (this.createImage(img)));
 
     document.addEventListener(
       'mousemove',
@@ -38,18 +38,13 @@ class ImageSlider extends React.Component {
     );
   }
 
-  createPage = (img) => {
-    const { width, height } = this.props;
+  createImage = (img) => {
     const image = new Image();
-    const that = this;
-    image.onload = function () {
-      that.go();
+    image.onload = () => {
+      this.go();
     };
     image.src = img;
-    return {
-      image,
-      scale: Math.min(width / image.width, height / image.height),
-    };
+    return image;
   }
 
   isLeftBoundaryValid = () => this.firstPageX - (this.offset) <= 0;
@@ -109,6 +104,12 @@ class ImageSlider extends React.Component {
     return this.firstPageX - this.offset;
   }
 
+  getXFromPage = (pageIndex) => {
+    const { width: canasWidth } = this.props;
+    const x = this.calculateXWithOffset(this.offset);
+    return x + (canasWidth * pageIndex);
+  };
+
   scaleToFitAndDrawImage() {
     const { context } = this.state;
     const {
@@ -120,26 +121,25 @@ class ImageSlider extends React.Component {
     } = this.props;
 
     this.offset = this.initialDragX - this.currentDragX;
-    const x = this.calculateXWithOffset(this.offset);
-    this.pages.forEach(({ image, scale }, index) => {
+
+    this.pages.forEach((image, index) => {
       // just paint current page and the adjacent
       if (this.currentPage - index >= (Math.floor(pagesToPaint / 2) * -1)
           && this.currentPage - index <= Math.floor(pagesToPaint / 2)) {
-        // image may not be loaded on first paint when Chrome WebTools is open, because of the
-        // scale calculation
+        const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
         context.drawImage(
           image,
-          (x + (width * index)) + ((width / 2) - (image.width / 2) * scale),
+          this.getXFromPage(index) + ((width / 2) - (image.width / 2) * scale),
           ((height - (image.height * scale)) / 2),
-          image.width * scale,
-          image.height * scale,
+          image.naturalWidth * scale,
+          image.naturalHeight * scale,
         );
 
         if (showPageBorders) {
           context.beginPath();
           context.strokeStyle = pageBorderColor;
           context.lineWidth = 1;
-          context.strokeRect(x + (width * index), 0, width, height);
+          context.strokeRect(this.getXFromPage(index), 0, width, height);
         }
       }
     });
