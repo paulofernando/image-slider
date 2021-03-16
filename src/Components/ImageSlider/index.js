@@ -130,7 +130,7 @@ class ImageSlider extends React.Component {
           (x + (width * index)) + ((width / 2) - (image.width / 2) * scale),
           ((height - (image.height * scale)) / 2),
           image.width * scale,
-          image.height * scale, // TODO scale is breaking first paint
+          image.height * scale, // TODO scale is breaking first paint in dev env
         );
 
         if (showPageBorders) {
