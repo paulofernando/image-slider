@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+const pagesToPaint = 5;
+
 class ImageSlider extends React.Component {
   state = {
     isDragging: false,
@@ -22,6 +24,22 @@ class ImageSlider extends React.Component {
     const { images } = this.props;
     this.setState({ context: this.canvasRef.current.getContext('2d') });
     this.pages = images.map((img) => (this.createPage(img)));
+
+    document.addEventListener(
+      'mousemove',
+      (e) => {
+        this.handleMouseMove(e);
+      },
+      { once: false },
+    );
+
+    document.addEventListener(
+      'mouseup',
+      (e) => {
+        this.handleMouseUp(e);
+      },
+      { once: false },
+    );
   }
 
   createPage = (img) => {
@@ -78,10 +96,6 @@ class ImageSlider extends React.Component {
     });
   }
 
-  handleMouseOut = () => {
-    this.stopDragging();
-  };
-
   handleMouseUp = () => {
     this.stopDragging();
   };
@@ -102,17 +116,21 @@ class ImageSlider extends React.Component {
   scaleToFitAndDrawImage() {
     const { context, currentPage } = this.state;
     const { width, height, showPageBorders } = this.props;
+
     this.offset = this.initialDragX - this.currentDragX;
     const x = this.calculateXWithOffset(this.offset);
     this.pages.forEach(({ image, scale }, index) => {
       // just paint current page and the adjacent
-      if (currentPage - index >= -1 && currentPage - index <= 1) {
+      if (currentPage - index >= (Math.floor(pagesToPaint / 2) * -1) &&
+          currentPage - index <= Math.floor(pagesToPaint / 2)) {
         context.drawImage(
           image,
           (x + (width * index)) + ((width / 2) - (image.width / 2) * scale),
           ((height - (image.height * scale)) / 2),
-          image.width * scale, image.height * scale,
+          image.width * scale,
+          image.height * scale, // TODO scale is breaking first paint
         );
+
         if (showPageBorders) {
           context.beginPath();
           context.strokeStyle = '#ccc';
@@ -144,10 +162,6 @@ class ImageSlider extends React.Component {
         height={height}
         className="image-slider"
         onMouseDown={this.handleMouseDown}
-        onMouseUp={this.handleMouseUp}
-        onMouseMove={this.handleMouseMove}
-        onMouseOut={this.handleMouseOut}
-        onBlur={this.handleMouseOut}
       />
     );
   }
