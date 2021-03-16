@@ -125,12 +125,14 @@ class ImageSlider extends React.Component {
       // just paint current page and the adjacent
       if (this.currentPage - index >= (Math.floor(pagesToPaint / 2) * -1)
           && this.currentPage - index <= Math.floor(pagesToPaint / 2)) {
+        // image may not be loaded on first paint when Chrome WebTools is open, because of the
+        // scale calculation
         context.drawImage(
           image,
           (x + (width * index)) + ((width / 2) - (image.width / 2) * scale),
           ((height - (image.height * scale)) / 2),
           image.width * scale,
-          image.height * scale, // TODO scale is breaking first paint in dev env
+          image.height * scale,
         );
 
         if (showPageBorders) {

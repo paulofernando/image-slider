@@ -1,12 +1,12 @@
 import React from 'react';
 
 import ImageSlider from './Components/ImageSlider';
-import image1 from './images/200x200.png';
+import image1 from './images/640x400.png';
 import image2 from './images/300x400.png';
 import image3 from './images/400x300.png';
 import image4 from './images/600x200.png';
 import image5 from './images/200x600.png';
-import image6 from './images/300x300.png';
+import image6 from './images/400x400.png';
 import './App.css';
 
 function App() {
