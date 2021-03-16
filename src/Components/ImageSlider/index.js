@@ -1,15 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const pagesToPaint = 5;
-
 class ImageSlider extends React.Component {
-  state = {
-    isDragging: false,
-    context: null,
-    currentPage: 0,
-  };
-
   constructor(props) {
     super(props);
     this.canvasRef = React.createRef();
@@ -18,6 +10,12 @@ class ImageSlider extends React.Component {
     this.firstPageX = 0;
     this.offset = 0;
     this.oldX = 0; // used to control movement direction
+    this.currentPage = 0;
+
+    this.state = {
+      isDragging: false,
+      context: null,
+    };
   }
 
   componentDidMount() {
@@ -30,7 +28,6 @@ class ImageSlider extends React.Component {
       (e) => {
         this.handleMouseMove(e);
       },
-      { once: false },
     );
 
     document.addEventListener(
@@ -38,7 +35,6 @@ class ImageSlider extends React.Component {
       (e) => {
         this.handleMouseUp(e);
       },
-      { once: false },
     );
   }
 
@@ -76,23 +72,23 @@ class ImageSlider extends React.Component {
 
   handleMouseMove = (e) => {
     const { isDragging } = this.state;
+    const { width } = this.props;
     if (isDragging) {
       if ((this.isLeftBoundaryValid() && this.isMovingToTheLeft(e.pageX))
           || (this.isRightBoundaryValid() && this.isMovingToTheRight(e.pageX))) {
         this.currentDragX = e.pageX;
       }
       requestAnimationFrame(this.go.bind(this));
+      this.currentPage = Math.round(Math.abs(this.firstPageX) / width);
     }
     this.oldX = e.pageX;
   };
 
   stopDragging = () => {
-    const { width } = this.props;
     this.firstPageX = this.calculateXWithOffset(this.offset);
     this.initialDragX = this.currentDragX;
     this.setState({
       isDragging: false,
-      currentPage: (this.currentDragX === 0 ? 0 : Math.round(Math.abs(this.firstPageX) / width)),
     });
   }
 
@@ -114,15 +110,21 @@ class ImageSlider extends React.Component {
   }
 
   scaleToFitAndDrawImage() {
-    const { context, currentPage } = this.state;
-    const { width, height, showPageBorders } = this.props;
+    const { context } = this.state;
+    const {
+      width,
+      height,
+      showPageBorders,
+      pageBorderColor,
+      pagesToPaint,
+    } = this.props;
 
     this.offset = this.initialDragX - this.currentDragX;
     const x = this.calculateXWithOffset(this.offset);
     this.pages.forEach(({ image, scale }, index) => {
       // just paint current page and the adjacent
-      if (currentPage - index >= (Math.floor(pagesToPaint / 2) * -1) &&
-          currentPage - index <= Math.floor(pagesToPaint / 2)) {
+      if (this.currentPage - index >= (Math.floor(pagesToPaint / 2) * -1)
+          && this.currentPage - index <= Math.floor(pagesToPaint / 2)) {
         context.drawImage(
           image,
           (x + (width * index)) + ((width / 2) - (image.width / 2) * scale),
@@ -133,7 +135,7 @@ class ImageSlider extends React.Component {
 
         if (showPageBorders) {
           context.beginPath();
-          context.strokeStyle = '#ccc';
+          context.strokeStyle = pageBorderColor;
           context.lineWidth = 1;
           context.strokeRect(x + (width * index), 0, width, height);
         }
@@ -148,8 +150,8 @@ class ImageSlider extends React.Component {
 
   resetCanvas() {
     const { context } = this.state;
-    const { width, height } = this.props;
-    context.fillStyle = '#eee';
+    const { width, height, backgroundColor } = this.props;
+    context.fillStyle = backgroundColor;
     context.fillRect(0, 0, width, height);
   }
 
@@ -170,14 +172,20 @@ class ImageSlider extends React.Component {
 ImageSlider.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
-  images: PropTypes.arrayOf(PropTypes.string).isRequired,
   showPageBorders: PropTypes.bool,
+  backgroundColor: PropTypes.string,
+  pageBorderColor: PropTypes.string,
+  pagesToPaint: PropTypes.number,
+  images: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 ImageSlider.defaultProps = {
   width: 300,
   height: 300,
   showPageBorders: false,
+  backgroundColor: '#eee',
+  pageBorderColor: '#ccc',
+  pagesToPaint: 11, // pages that will be painted (current, 5 on the left, 5 on the right)
 };
 
 export default ImageSlider;
